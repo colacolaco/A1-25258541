@@ -23,6 +23,19 @@ java -cp bin AssignmentOne
 `console-output.txt` is the complete output of one run, kept as evidence of the
 demonstration.
 
+### Running it in Visual Studio Code
+
+1. Open the `A1-25258541` folder itself in VS Code (File > Open Folder), not a
+   parent folder.
+2. Install the "Extension Pack for Java" (Microsoft). It also needs a JDK 21 to
+   run its language server; the project itself still compiles at JDK 17.
+3. Open `src/AssignmentOne.java` and press `F5`, or use the Run button above
+   `main`. The included `.vscode/launch.json` starts `AssignmentOne` with the
+   working folder set to the project root.
+
+Local editor settings live in `.vscode/`, which is git-ignored, so the
+submission stays source-only.
+
 ## Project layout
 
 ```
