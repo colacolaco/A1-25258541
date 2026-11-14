@@ -14,7 +14,8 @@ import java.util.List;
  *
  * <p>Every operation returns a message. When an operation succeeds the message
  * starts with "BOOKED", "CANCELLED" or "VIEW"; when it cannot be performed the
- * message starts with "WARNING:" and explains why.</p>
+ * message starts with "WARNING:" and explains why. No operation throws an
+ * exception: the brief asks every failure to be reported as a message.</p>
  *
  * @author 25258541
  * @version 1.0
@@ -24,11 +25,14 @@ public class Clinic {
     /** The prefix used by every message that reports a failed operation. */
     public static final String WARNING_PREFIX = "WARNING: ";
 
+    /** The name used when no clinic name is supplied. */
+    private static final String UNKNOWN_NAME = "Unnamed clinic";
+
     /** The name of the clinic. */
     private final String name;
 
     /** The day the clinic is operating on. Bookings are only made for this day. */
-    private final Day operatingDay;
+    private final String operatingDay;
 
     /** The fixed set of time slots the clinic can book. */
     private final ClinicSchedule schedule;
@@ -41,9 +45,8 @@ public class Clinic {
      *
      * @param name         the name of the clinic
      * @param operatingDay the day the clinic is operating on
-     * @throws IllegalArgumentException if either argument is missing
      */
-    public Clinic(String name, Day operatingDay) {
+    public Clinic(String name, String operatingDay) {
         this(name, operatingDay, new ClinicSchedule());
     }
 
@@ -53,21 +56,11 @@ public class Clinic {
      * @param name         the name of the clinic
      * @param operatingDay the day the clinic is operating on
      * @param schedule     the fixed set of bookable time slots
-     * @throws IllegalArgumentException if any argument is missing
      */
-    public Clinic(String name, Day operatingDay, ClinicSchedule schedule) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("A clinic must have a name.");
-        }
-        if (operatingDay == null) {
-            throw new IllegalArgumentException("A clinic must have an operating day.");
-        }
-        if (schedule == null) {
-            throw new IllegalArgumentException("A clinic must have a daily schedule.");
-        }
-        this.name = name.trim();
-        this.operatingDay = operatingDay;
-        this.schedule = schedule;
+    public Clinic(String name, String operatingDay, ClinicSchedule schedule) {
+        this.name = name == null || name.trim().isEmpty() ? UNKNOWN_NAME : name.trim();
+        this.operatingDay = Day.isValid(operatingDay) ? operatingDay : Day.MONDAY;
+        this.schedule = schedule == null ? new ClinicSchedule() : schedule;
         this.appointments = new ArrayList<>();
     }
 
@@ -83,9 +76,9 @@ public class Clinic {
     /**
      * Returns the day the clinic is operating on.
      *
-     * @return the operating day
+     * @return the operating day, for example "Monday"
      */
-    public Day getOperatingDay() {
+    public String getOperatingDay() {
         return operatingDay;
     }
 
@@ -123,7 +116,7 @@ public class Clinic {
         }
         // 2. The professional must work on the day the clinic is operating.
         if (!professional.worksOn(operatingDay)) {
-            return warning(professional.getSummary() + " does not work on " + operatingDay.getDisplayName() + "s.");
+            return warning(professional.getSummary() + " does not work on " + operatingDay + "s.");
         }
         // 3. The same professional must never be booked into the same slot twice.
         Appointment professionalClash = findAppointmentFor(professional, time);
@@ -138,8 +131,8 @@ public class Clinic {
         }
 
         appointments.add(appointment);
-        return String.format("BOOKED      %s  %s for %s",
-                time, professional.getSummary(), appointment.getPatient().getName());
+        return "BOOKED      " + time + "  " + professional.getSummary()
+                + " for " + appointment.getPatient().getName();
     }
 
     /**
@@ -198,13 +191,12 @@ public class Clinic {
      * <p>This works for the whole appointment book or for a filtered subset,
      * because the sorting is done on whatever list it is given.</p>
      *
-     * @param appointmentsToSort the appointments to sort
-     * @return a sorted copy of the list
-     * @throws IllegalArgumentException if the list is null
+     * @param appointmentsToSort the appointments to sort, which may be null
+     * @return a sorted copy of the list, or an empty list when nothing was given
      */
     public List<Appointment> sortByAppointmentTime(List<Appointment> appointmentsToSort) {
         if (appointmentsToSort == null) {
-            throw new IllegalArgumentException("There is nothing to sort.");
+            return new ArrayList<>();
         }
         List<Appointment> sorted = new ArrayList<>(appointmentsToSort);
         // Appointment implements Comparable, so no comparator has to be written.
@@ -246,8 +238,8 @@ public class Clinic {
                     + " at " + time + ".");
         }
         appointments.remove(found);
-        return String.format("CANCELLED   %s  %s for %s",
-                found.getTimeSlot(), found.getProfessional().getSummary(), found.getPatient().getName());
+        return "CANCELLED   " + found.getTimeSlot() + "  " + found.getProfessional().getSummary()
+                + " for " + found.getPatient().getName();
     }
 
     /**
@@ -277,8 +269,8 @@ public class Clinic {
             }
         }
         appointments.remove(earliest);
-        String message = String.format("CANCELLED   %s  %s for %s",
-                earliest.getTimeSlot(), earliest.getProfessional().getSummary(), earliest.getPatient().getName());
+        String message = "CANCELLED   " + earliest.getTimeSlot() + "  " + earliest.getProfessional().getSummary()
+                + " for " + earliest.getPatient().getName();
         int remaining = patientAppointments.size() - 1;
         if (remaining > 0) {
             message = message + " (" + remaining + " other appointment(s) for this patient remain.)";
@@ -347,7 +339,7 @@ public class Clinic {
      */
     @Override
     public String toString() {
-        return String.format("%s - %s, %s, %d appointment(s)",
-                name, operatingDay.getDisplayName(), schedule, appointments.size());
+        return name + " - " + operatingDay + ", " + schedule + ", "
+                + appointments.size() + " appointment(s)";
     }
 }

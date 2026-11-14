@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -40,22 +39,20 @@ public class AssignmentOne {
         // constructor supplies every detail; the short constructor uses the
         // default Monday to Friday week.
         GeneralPractitioner drNguyen = new GeneralPractitioner("1001", "Dr Alice Nguyen",
-                EnumSet.of(Day.MONDAY, Day.WEDNESDAY, Day.FRIDAY), "G-01", 12);
+                daysOf(new String[] {Day.MONDAY, Day.WEDNESDAY, Day.FRIDAY}), "G-01", 12);
         GeneralPractitioner drCarter = new GeneralPractitioner("1002", "Dr Ben Carter",
                 Day.weekdays(), "G-02", 5);
         GeneralPractitioner drRossi = new GeneralPractitioner("1003", "Dr Sofia Rossi",
-                EnumSet.of(Day.TUESDAY, Day.THURSDAY), "G-03", 20);
+                daysOf(new String[] {Day.TUESDAY, Day.THURSDAY}), "G-03", 20);
         Specialist drZhang = new Specialist("2001", "Dr Wei Zhang", "Cardiology",
-                EnumSet.of(Day.MONDAY, Day.TUESDAY, Day.WEDNESDAY), "Ward 3B");
+                daysOf(new String[] {Day.MONDAY, Day.TUESDAY, Day.WEDNESDAY}), "Ward 3B");
         Specialist drOkafor = new Specialist("2002", "Dr Amara Okafor", "Paediatrics");
-        Nurse nurseMiller = new Nurse("3001", "Grace Miller",
-                EnumSet.of(Day.MONDAY, Day.TUESDAY, Day.WEDNESDAY, Day.THURSDAY, Day.FRIDAY),
-                "Registered Nurse", 8);
+        Nurse nurseMiller = new Nurse("3001", "Grace Miller", Day.weekdays(), "Registered Nurse", 8);
         Nurse nursePatel = new Nurse("3002", "Tom Patel");
         Surgeon drKing = new Surgeon("5001", "Dr Marcus King", "Orthopaedics",
-                EnumSet.of(Day.MONDAY, Day.THURSDAY), "Theatre 2", 6);
+                daysOf(new String[] {Day.MONDAY, Day.THURSDAY}), "Theatre 2", 6);
         Dietitian dietitianLee = new Dietitian("4001", "Hannah Lee", "Sports nutrition",
-                EnumSet.of(Day.MONDAY, Day.WEDNESDAY), "D-02");
+                daysOf(new String[] {Day.MONDAY, Day.WEDNESDAY}), "D-02");
 
         // One list of the general type holds every kind of professional, so
         // the loop below works without a separate loop for each type. Adding
@@ -181,26 +178,32 @@ public class AssignmentOne {
         System.out.println("addAppointment then validates times against it with no other change.");
 
         // ===================================================================
-        // Part 1: invalid objects cannot be created
+        // Part 1: invalid data is reported before an object is created
         // ===================================================================
-        printSection("INVALID OBJECTS ARE REJECTED");
-        try {
-            new Nurse("12A", "Nurse Test");
-        } catch (IllegalArgumentException exception) {
-            System.out.println("  Rejected nurse:   " + exception.getMessage());
-        }
-        try {
-            new Patient("Test Patient", "12345");
-        } catch (IllegalArgumentException exception) {
-            System.out.println("  Rejected patient: " + exception.getMessage());
-        }
-        try {
-            new TimeSlot(9, 75);
-        } catch (IllegalArgumentException exception) {
-            System.out.println("  Rejected time:    " + exception.getMessage());
-        }
+        printSection("INVALID DATA IS REJECTED BEFORE AN OBJECT IS BUILT");
+        System.out.println("  " + HealthProfessional.validateId("12A"));
+        System.out.println("  " + Patient.validateMobile("12345"));
+        System.out.println("  " + TimeSlot.validate(9, 75));
+        System.out.println();
+        System.out.println("Each check returns a message instead of causing an error, so the program");
+        System.out.println("can show the message to the user and carry on with the valid data.");
 
         printSection("END OF DEMONSTRATION");
+    }
+
+    /**
+     * Builds a list of working days from an array of day names, so that the
+     * demonstration can pass several days to a constructor in one line.
+     *
+     * @param dayNames the days to put in the list
+     * @return a new list holding the given days
+     */
+    private static List<String> daysOf(String[] dayNames) {
+        List<String> days = new ArrayList<>();
+        for (int index = 0; index < dayNames.length; index++) {
+            days.add(dayNames[index]);
+        }
+        return days;
     }
 
     /**

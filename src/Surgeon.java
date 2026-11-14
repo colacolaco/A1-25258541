@@ -1,4 +1,4 @@
-import java.util.Set;
+import java.util.List;
 
 /**
  * A surgeon: a doctor who performs operations.
@@ -13,6 +13,12 @@ import java.util.Set;
  */
 public class Surgeon extends HealthProfessional {
 
+    /** The default area of surgery used when none is supplied. */
+    private static final String DEFAULT_SPECIALITY = "Orthopaedics";
+
+    /** The default operating theatre used when none is supplied. */
+    private static final String DEFAULT_THEATRE = "Theatre 1";
+
     /** The area of surgery, for example "Orthopaedics". */
     private final String speciality;
 
@@ -25,29 +31,19 @@ public class Surgeon extends HealthProfessional {
     /**
      * Creates a surgeon with a full set of details.
      *
-     * @param id              the identifier of the surgeon, numbers only
-     * @param name            the full name of the surgeon
-     * @param speciality      the area of surgery
-     * @param availableDays   the days of the week the surgeon works
-     * @param operatingTheatre the operating theatre the surgeon uses
+     * @param id                the identifier of the surgeon, numbers only
+     * @param name              the full name of the surgeon
+     * @param speciality        the area of surgery
+     * @param availableDays     the days of the week the surgeon works
+     * @param operatingTheatre  the operating theatre the surgeon uses
      * @param operationsPerWeek the number of operations per week, zero or more
-     * @throws IllegalArgumentException if any detail is missing or invalid
      */
-    public Surgeon(String id, String name, String speciality, Set<Day> availableDays,
+    public Surgeon(String id, String name, String speciality, List<String> availableDays,
             String operatingTheatre, int operationsPerWeek) {
         super(id, name, availableDays);
-        if (speciality == null || speciality.trim().isEmpty()) {
-            throw new IllegalArgumentException("A surgeon must have an area of surgery.");
-        }
-        if (operatingTheatre == null || operatingTheatre.trim().isEmpty()) {
-            throw new IllegalArgumentException("A surgeon must have an operating theatre.");
-        }
-        if (operationsPerWeek < 0) {
-            throw new IllegalArgumentException("The number of operations cannot be negative.");
-        }
-        this.speciality = speciality.trim();
-        this.operatingTheatre = operatingTheatre.trim();
-        this.operationsPerWeek = operationsPerWeek;
+        this.speciality = isBlank(speciality) ? DEFAULT_SPECIALITY : speciality.trim();
+        this.operatingTheatre = isBlank(operatingTheatre) ? DEFAULT_THEATRE : operatingTheatre.trim();
+        this.operationsPerWeek = operationsPerWeek < 0 ? 0 : operationsPerWeek;
     }
 
     /**
@@ -56,10 +52,9 @@ public class Surgeon extends HealthProfessional {
      *
      * @param id   the identifier of the surgeon, numbers only
      * @param name the full name of the surgeon
-     * @throws IllegalArgumentException if the id or name is invalid
      */
     public Surgeon(String id, String name) {
-        this(id, name, "Orthopaedics", Day.weekdays(), "Theatre 1", 4);
+        this(id, name, DEFAULT_SPECIALITY, Day.weekdays(), DEFAULT_THEATRE, 4);
     }
 
     /**
@@ -115,18 +110,17 @@ public class Surgeon extends HealthProfessional {
      *
      * @param patientName the name of the patient
      * @param procedure   the name of the procedure
-     * @return a one line record of the operation
-     * @throws IllegalArgumentException if the patient name or procedure is missing
+     * @return a one line record of the operation, or a warning when a detail is missing
      */
     public String performProcedure(String patientName, String procedure) {
-        if (patientName == null || patientName.trim().isEmpty()) {
-            throw new IllegalArgumentException("An operation needs a patient name.");
+        if (isBlank(patientName)) {
+            return WARNING_PREFIX + "an operation needs a patient name.";
         }
-        if (procedure == null || procedure.trim().isEmpty()) {
-            throw new IllegalArgumentException("An operation needs the name of a procedure.");
+        if (isBlank(procedure)) {
+            return WARNING_PREFIX + "an operation needs the name of a procedure.";
         }
-        return String.format("%s performed the %s procedure on %s in %s.",
-                getName(), procedure.trim(), patientName.trim(), operatingTheatre);
+        return getName() + " performed the " + procedure.trim() + " procedure on "
+                + patientName.trim() + " in " + operatingTheatre + ".";
     }
 
     /**
@@ -137,6 +131,6 @@ public class Surgeon extends HealthProfessional {
     @Override
     public String toString() {
         return super.toString()
-                + String.format("%n    Theatre: %s | Operations per week: %d", operatingTheatre, operationsPerWeek);
+                + "\n    Theatre: " + operatingTheatre + " | Operations per week: " + operationsPerWeek;
     }
 }

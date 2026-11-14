@@ -1,4 +1,4 @@
-import java.util.Set;
+import java.util.List;
 
 /**
  * A specialist: a doctor who focuses on one area of medicine, such as
@@ -12,6 +12,12 @@ import java.util.Set;
  * @version 1.0
  */
 public class Specialist extends HealthProfessional {
+
+    /** The default area of medicine used when none is supplied. */
+    private static final String DEFAULT_SPECIALITY = "General medicine";
+
+    /** The default ward used when none is supplied. */
+    private static final String DEFAULT_WARD = "Ward 1";
 
     /** The area the specialist works in, for example "Cardiology". */
     private final String speciality;
@@ -27,18 +33,11 @@ public class Specialist extends HealthProfessional {
      * @param speciality    the area of medicine, for example "Cardiology"
      * @param availableDays the days of the week the specialist works
      * @param ward          the hospital ward the specialist is based in
-     * @throws IllegalArgumentException if any detail is missing or invalid
      */
-    public Specialist(String id, String name, String speciality, Set<Day> availableDays, String ward) {
+    public Specialist(String id, String name, String speciality, List<String> availableDays, String ward) {
         super(id, name, availableDays);
-        if (speciality == null || speciality.trim().isEmpty()) {
-            throw new IllegalArgumentException("A specialist must have an area of specialisation.");
-        }
-        if (ward == null || ward.trim().isEmpty()) {
-            throw new IllegalArgumentException("A specialist must be based in a ward.");
-        }
-        this.speciality = speciality.trim();
-        this.ward = ward.trim();
+        this.speciality = isBlank(speciality) ? DEFAULT_SPECIALITY : speciality.trim();
+        this.ward = isBlank(ward) ? DEFAULT_WARD : ward.trim();
     }
 
     /**
@@ -47,10 +46,9 @@ public class Specialist extends HealthProfessional {
      * @param id         the identifier of the specialist, numbers only
      * @param name       the full name of the specialist
      * @param speciality the area of medicine, for example "Paediatrics"
-     * @throws IllegalArgumentException if any detail is missing or invalid
      */
     public Specialist(String id, String name, String speciality) {
-        this(id, name, speciality, Day.weekdays(), "Ward 1");
+        this(id, name, speciality, Day.weekdays(), DEFAULT_WARD);
     }
 
     /**
@@ -97,17 +95,16 @@ public class Specialist extends HealthProfessional {
      *
      * @param patientName the name of the patient
      * @param testName    the test being ordered, for example "Echocardiogram"
-     * @return a one line record of the test order
-     * @throws IllegalArgumentException if the patient name or test name is missing
+     * @return a one line record of the test order, or a warning when a detail is missing
      */
     public String orderDiagnosticTest(String patientName, String testName) {
-        if (patientName == null || patientName.trim().isEmpty()) {
-            throw new IllegalArgumentException("A test order needs a patient name.");
+        if (isBlank(patientName)) {
+            return WARNING_PREFIX + "a test order needs a patient name.";
         }
-        if (testName == null || testName.trim().isEmpty()) {
-            throw new IllegalArgumentException("A test order needs the name of a test.");
+        if (isBlank(testName)) {
+            return WARNING_PREFIX + "a test order needs the name of a test.";
         }
-        return String.format("%s ordered a diagnostic test (%s) for %s.", getName(), testName.trim(), patientName.trim());
+        return getName() + " ordered a diagnostic test (" + testName.trim() + ") for " + patientName.trim() + ".";
     }
 
     /**
@@ -117,6 +114,6 @@ public class Specialist extends HealthProfessional {
      */
     @Override
     public String toString() {
-        return super.toString() + String.format("%n    Ward: %s", ward);
+        return super.toString() + "\n    Ward: " + ward;
     }
 }

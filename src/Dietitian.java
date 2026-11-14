@@ -1,4 +1,4 @@
-import java.util.Set;
+import java.util.List;
 
 /**
  * A dietitian: a health professional who plans what a patient eats.
@@ -12,6 +12,12 @@ import java.util.Set;
  * @version 1.0
  */
 public class Dietitian extends HealthProfessional {
+
+    /** The default area of dietetics used when none is supplied. */
+    private static final String DEFAULT_SPECIALITY = "General dietetics";
+
+    /** The default consulting room used when none is supplied. */
+    private static final String DEFAULT_ROOM = "D-01";
 
     /** The area of dietetics, for example "Sports nutrition". */
     private final String speciality;
@@ -27,18 +33,11 @@ public class Dietitian extends HealthProfessional {
      * @param speciality     the area of dietetics
      * @param availableDays  the days of the week the dietitian works
      * @param consultingRoom the consulting room the dietitian uses
-     * @throws IllegalArgumentException if any detail is missing or invalid
      */
-    public Dietitian(String id, String name, String speciality, Set<Day> availableDays, String consultingRoom) {
+    public Dietitian(String id, String name, String speciality, List<String> availableDays, String consultingRoom) {
         super(id, name, availableDays);
-        if (speciality == null || speciality.trim().isEmpty()) {
-            throw new IllegalArgumentException("A dietitian must have an area of specialisation.");
-        }
-        if (consultingRoom == null || consultingRoom.trim().isEmpty()) {
-            throw new IllegalArgumentException("A dietitian must have a consulting room.");
-        }
-        this.speciality = speciality.trim();
-        this.consultingRoom = consultingRoom.trim();
+        this.speciality = isBlank(speciality) ? DEFAULT_SPECIALITY : speciality.trim();
+        this.consultingRoom = isBlank(consultingRoom) ? DEFAULT_ROOM : consultingRoom.trim();
     }
 
     /**
@@ -47,10 +46,9 @@ public class Dietitian extends HealthProfessional {
      *
      * @param id   the identifier of the dietitian, numbers only
      * @param name the full name of the dietitian
-     * @throws IllegalArgumentException if the id or name is invalid
      */
     public Dietitian(String id, String name) {
-        this(id, name, "General dietetics", Day.weekdays(), "D-01");
+        this(id, name, DEFAULT_SPECIALITY, Day.weekdays(), DEFAULT_ROOM);
     }
 
     /**
@@ -97,18 +95,16 @@ public class Dietitian extends HealthProfessional {
      *
      * @param patientName the name of the patient
      * @param goal        the health goal of the plan, for example "Lower cholesterol"
-     * @return a one line record of the plan
-     * @throws IllegalArgumentException if the patient name or goal is missing
+     * @return a one line record of the plan, or a warning when a detail is missing
      */
     public String createMealPlan(String patientName, String goal) {
-        if (patientName == null || patientName.trim().isEmpty()) {
-            throw new IllegalArgumentException("A meal plan needs a patient name.");
+        if (isBlank(patientName)) {
+            return WARNING_PREFIX + "a meal plan needs a patient name.";
         }
-        if (goal == null || goal.trim().isEmpty()) {
-            throw new IllegalArgumentException("A meal plan needs a health goal.");
+        if (isBlank(goal)) {
+            return WARNING_PREFIX + "a meal plan needs a health goal.";
         }
-        return String.format("%s created a meal plan for %s with the goal: %s.",
-                getName(), patientName.trim(), goal.trim());
+        return getName() + " created a meal plan for " + patientName.trim() + " with the goal: " + goal.trim() + ".";
     }
 
     /**
@@ -118,6 +114,6 @@ public class Dietitian extends HealthProfessional {
      */
     @Override
     public String toString() {
-        return super.toString() + String.format("%n    Room: %s", consultingRoom);
+        return super.toString() + "\n    Room: " + consultingRoom;
     }
 }

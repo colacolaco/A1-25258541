@@ -1,4 +1,4 @@
-import java.util.Set;
+import java.util.List;
 
 /**
  * A general practitioner (GP): the first point of contact for a patient.
@@ -12,6 +12,9 @@ import java.util.Set;
  * @version 1.0
  */
 public class GeneralPractitioner extends HealthProfessional {
+
+    /** The default consulting room used when none is supplied. */
+    private static final String DEFAULT_ROOM = "G-01";
 
     /** The consulting room the GP uses, for example "G-01". */
     private final String consultingRoom;
@@ -27,19 +30,15 @@ public class GeneralPractitioner extends HealthProfessional {
      * @param availableDays   the days of the week the GP works
      * @param consultingRoom  the consulting room the GP uses
      * @param yearsExperience the years of experience, zero or more
-     * @throws IllegalArgumentException if any detail is missing or invalid
      */
-    public GeneralPractitioner(String id, String name, Set<Day> availableDays,
+    public GeneralPractitioner(String id, String name, List<String> availableDays,
             String consultingRoom, int yearsExperience) {
         super(id, name, availableDays);
-        if (consultingRoom == null || consultingRoom.trim().isEmpty()) {
-            throw new IllegalArgumentException("A general practitioner must have a consulting room.");
-        }
-        if (yearsExperience < 0) {
-            throw new IllegalArgumentException("Years of experience cannot be negative.");
-        }
-        this.consultingRoom = consultingRoom.trim();
-        this.yearsExperience = yearsExperience;
+        this.consultingRoom = isBlank(consultingRoom) ? DEFAULT_ROOM : consultingRoom.trim();
+        // A negative number of years is replaced by zero, because experience
+        // cannot be negative. No exception is thrown: exceptions belong to
+        // Module 5, which this assessment may not use.
+        this.yearsExperience = yearsExperience < 0 ? 0 : yearsExperience;
     }
 
     /**
@@ -48,10 +47,9 @@ public class GeneralPractitioner extends HealthProfessional {
      *
      * @param id   the identifier of the GP, numbers only
      * @param name the full name of the GP
-     * @throws IllegalArgumentException if the id or name is invalid
      */
     public GeneralPractitioner(String id, String name) {
-        this(id, name, Day.weekdays(), "G-01", 1);
+        this(id, name, Day.weekdays(), DEFAULT_ROOM, 1);
     }
 
     /**
@@ -99,17 +97,16 @@ public class GeneralPractitioner extends HealthProfessional {
      *
      * @param patientName the name of the patient
      * @param medication  the medication and dosage, for example "Amoxicillin 500 mg"
-     * @return a one line record of the prescription
-     * @throws IllegalArgumentException if the patient name or medication is missing
+     * @return a one line record of the prescription, or a warning when a detail is missing
      */
     public String prescribeMedication(String patientName, String medication) {
-        if (patientName == null || patientName.trim().isEmpty()) {
-            throw new IllegalArgumentException("A prescription needs a patient name.");
+        if (isBlank(patientName)) {
+            return WARNING_PREFIX + "a prescription needs a patient name.";
         }
-        if (medication == null || medication.trim().isEmpty()) {
-            throw new IllegalArgumentException("A prescription needs a medication.");
+        if (isBlank(medication)) {
+            return WARNING_PREFIX + "a prescription needs a medication.";
         }
-        return String.format("%s prescribed %s to %s.", getName(), medication.trim(), patientName.trim());
+        return getName() + " prescribed " + medication.trim() + " to " + patientName.trim() + ".";
     }
 
     /**
@@ -120,6 +117,6 @@ public class GeneralPractitioner extends HealthProfessional {
     @Override
     public String toString() {
         return super.toString()
-                + String.format("%n    Room: %s | Experience: %s", consultingRoom, formatYears(yearsExperience));
+                + "\n    Room: " + consultingRoom + " | Experience: " + formatYears(yearsExperience);
     }
 }

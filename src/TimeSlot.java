@@ -14,7 +14,10 @@
 public class TimeSlot implements Comparable<TimeSlot> {
 
     /** Number of minutes in one hour. */
-    private static final int MINUTES_PER_HOUR = 60;
+    public static final int MINUTES_PER_HOUR = 60;
+
+    /** Number of hours in one day. */
+    public static final int HOURS_PER_DAY = 24;
 
     /** The hour of the day, from 0 to 23. */
     private final int hour;
@@ -25,19 +28,17 @@ public class TimeSlot implements Comparable<TimeSlot> {
     /**
      * Creates a time slot at the given hour and minute.
      *
-     * @param hour   the hour of the day, 0 to 23
-     * @param minute the minute of the hour, 0 to 59
-     * @throws IllegalArgumentException if the hour or minute is out of range
+     * <p>A value outside the range of a clock is pulled back into the range
+     * instead of causing an error, because exceptions are not part of the
+     * material allowed in this assessment. Call {@link #validate(int, int)}
+     * first when an invalid time has to be reported to a user.</p>
+     *
+     * @param hour   the hour of the day; values outside 0 to 23 are corrected
+     * @param minute the minute of the hour; values outside 0 to 59 are corrected
      */
     public TimeSlot(int hour, int minute) {
-        if (hour < 0 || hour > 23) {
-            throw new IllegalArgumentException("The hour must be between 0 and 23, but was " + hour + ".");
-        }
-        if (minute < 0 || minute > 59) {
-            throw new IllegalArgumentException("The minute must be between 0 and 59, but was " + minute + ".");
-        }
-        this.hour = hour;
-        this.minute = minute;
+        this.hour = normalise(hour, HOURS_PER_DAY - 1);
+        this.minute = normalise(minute, MINUTES_PER_HOUR - 1);
     }
 
     /**
@@ -50,6 +51,23 @@ public class TimeSlot implements Comparable<TimeSlot> {
      */
     public static TimeSlot of(int hour, int minute) {
         return new TimeSlot(hour, minute);
+    }
+
+    /**
+     * Checks an hour and a minute before a time slot is created.
+     *
+     * @param hour   the hour to check
+     * @param minute the minute to check
+     * @return an empty text when the values are valid, or a warning explaining why they are not
+     */
+    public static String validate(int hour, int minute) {
+        if (hour < 0 || hour > HOURS_PER_DAY - 1) {
+            return "WARNING: the hour must be between 0 and " + (HOURS_PER_DAY - 1) + ", but was " + hour + ".";
+        }
+        if (minute < 0 || minute > MINUTES_PER_HOUR - 1) {
+            return "WARNING: the minute must be between 0 and " + (MINUTES_PER_HOUR - 1) + ", but was " + minute + ".";
+        }
+        return "";
     }
 
     /**
@@ -83,16 +101,12 @@ public class TimeSlot implements Comparable<TimeSlot> {
     /**
      * Orders two time slots from earliest to latest.
      *
-     * @param other the slot to compare against
+     * @param other the slot to compare against, which must not be null
      * @return a negative number if this slot is earlier, zero if the two slots
      *         are the same time, or a positive number if this slot is later
-     * @throws NullPointerException if other is null
      */
     @Override
     public int compareTo(TimeSlot other) {
-        if (other == null) {
-            throw new NullPointerException("A time slot cannot be compared with null.");
-        }
         int thisMinutes = toMinutesSinceMidnight();
         int otherMinutes = other.toMinutesSinceMidnight();
         if (thisMinutes < otherMinutes) {
@@ -140,7 +154,37 @@ public class TimeSlot implements Comparable<TimeSlot> {
      */
     @Override
     public String toString() {
-        return String.format("%02d:%02d", hour, minute);
+        return twoDigits(hour) + ":" + twoDigits(minute);
     }
 
+    /**
+     * Returns a whole number of the clock padded with a leading zero when it
+     * is smaller than ten, for example "08".
+     *
+     * @param value the number to pad
+     * @return the number as two characters
+     */
+    public static String twoDigits(int value) {
+        if (value < 10) {
+            return "0" + value;
+        }
+        return "" + value;
+    }
+
+    /**
+     * Pulls a clock value back into its allowed range.
+     *
+     * @param value the value supplied by the caller
+     * @param maximum the largest allowed value
+     * @return the value limited to the range 0 to maximum
+     */
+    private static int normalise(int value, int maximum) {
+        if (value < 0) {
+            return 0;
+        }
+        if (value > maximum) {
+            return maximum;
+        }
+        return value;
+    }
 }

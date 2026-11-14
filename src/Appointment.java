@@ -14,6 +14,9 @@
  */
 public class Appointment implements Comparable<Appointment> {
 
+    /** The width of the health professional column when details are printed. */
+    private static final int COLUMN_WIDTH = 52;
+
     /** The patient who booked the appointment. */
     private final Patient patient;
 
@@ -27,21 +30,11 @@ public class Appointment implements Comparable<Appointment> {
      * Creates an appointment. All details are required, so an appointment can
      * never be created while it is missing a patient, a professional or a time.
      *
-     * @param patient      the patient who booked the appointment
-     * @param professional the health professional the patient will see
-     * @param timeSlot     the time the appointment starts
-     * @throws IllegalArgumentException if any detail is missing
+     * @param patient      the patient who booked the appointment, must not be null
+     * @param professional the health professional the patient will see, must not be null
+     * @param timeSlot     the time the appointment starts, must not be null
      */
     public Appointment(Patient patient, HealthProfessional professional, TimeSlot timeSlot) {
-        if (patient == null) {
-            throw new IllegalArgumentException("An appointment must have a patient.");
-        }
-        if (professional == null) {
-            throw new IllegalArgumentException("An appointment must have a health professional.");
-        }
-        if (timeSlot == null) {
-            throw new IllegalArgumentException("An appointment must have a time.");
-        }
         this.patient = patient;
         this.professional = professional;
         this.timeSlot = timeSlot;
@@ -81,17 +74,13 @@ public class Appointment implements Comparable<Appointment> {
      * professionals, the brief allows either order. The professional ID is
      * used as a tie break so that a printed list is always in the same order.</p>
      *
-     * @param other the appointment to compare against
+     * @param other the appointment to compare against, which must not be null
      * @return a negative number if this appointment is earlier, zero if the
      *         two appointments have the same time and professional, or a
      *         positive number if this appointment is later
-     * @throws NullPointerException if other is null
      */
     @Override
     public int compareTo(Appointment other) {
-        if (other == null) {
-            throw new NullPointerException("An appointment cannot be compared with null.");
-        }
         int byTime = timeSlot.compareTo(other.timeSlot);
         if (byTime != 0) {
             return byTime;
@@ -107,6 +96,22 @@ public class Appointment implements Comparable<Appointment> {
      */
     @Override
     public String toString() {
-        return String.format("%s  %-52s  %s", timeSlot, professional.getSummary(), patient);
+        return timeSlot + "  " + padRight(professional.getSummary(), COLUMN_WIDTH) + "  " + patient;
+    }
+
+    /**
+     * Pads text with spaces on the right until it reaches the given width, so
+     * the printed columns stay aligned.
+     *
+     * @param text  the text to pad
+     * @param width the minimum width of the result
+     * @return the text followed by enough spaces to reach the width
+     */
+    private static String padRight(String text, int width) {
+        String padded = text;
+        while (padded.length() < width) {
+            padded = padded + " ";
+        }
+        return padded;
     }
 }

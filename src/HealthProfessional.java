@@ -1,5 +1,5 @@
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The information and behaviour shared by every health professional working
@@ -16,10 +16,25 @@ import java.util.Set;
  * invalid state after it has been created. External code can read the data
  * through the public getters.</p>
  *
+ * <p>Because exceptions belong to Module 5 and this assessment may only use
+ * Modules 1 to 3, an invalid value is reported by the static validation
+ * methods below instead of being thrown. The constructor itself can therefore
+ * never fail: it replaces a missing or invalid value with a safe default, so
+ * that the object it builds always holds usable data.</p>
+ *
  * @author 25258541
  * @version 1.0
  */
 public abstract class HealthProfessional {
+
+    /** The ID used when the supplied ID is not valid. */
+    private static final String UNKNOWN_ID = "0000";
+
+    /** The name used when the supplied name is missing. */
+    private static final String UNKNOWN_NAME = "Unnamed professional";
+
+    /** The prefix used by every validation message that reports a problem. */
+    public static final String WARNING_PREFIX = "WARNING: ";
 
     /** The unique identifier of the professional. Numbers only. */
     private final String id;
@@ -27,8 +42,8 @@ public abstract class HealthProfessional {
     /** The full name of the professional, for example "Dr Alice Nguyen". */
     private final String name;
 
-    /** The days of the week on which this professional works. */
-    private final Set<Day> availableDays;
+    /** The days of the week on which this professional works, in calendar order. */
+    private final List<String> availableDays;
 
     /**
      * Creates a health professional who works on the given days.
@@ -39,33 +54,20 @@ public abstract class HealthProfessional {
      * @param id            the identifier of the professional, numbers only
      * @param name          the full name of the professional
      * @param availableDays the days of the week the professional works
-     * @throws IllegalArgumentException if any argument is missing or invalid
      */
-    protected HealthProfessional(String id, String name, Set<Day> availableDays) {
-        if (!isDigitsOnly(id)) {
-            throw new IllegalArgumentException("A health professional ID must contain numbers only, but was \"" + id + "\".");
-        }
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("A health professional must have a name.");
-        }
-        if (availableDays == null || availableDays.isEmpty()) {
-            throw new IllegalArgumentException("A health professional must work on at least one day of the week.");
-        }
-        this.id = id;
-        this.name = name.trim();
-        // A copy is stored so that later changes to the caller's set cannot
-        // change this object, and EnumSet keeps the days in calendar order.
-        this.availableDays = EnumSet.copyOf(availableDays);
+    protected HealthProfessional(String id, String name, List<String> availableDays) {
+        this.id = isDigitsOnly(id) ? id : UNKNOWN_ID;
+        this.name = isBlank(name) ? UNKNOWN_NAME : name.trim();
+        this.availableDays = normaliseDays(availableDays);
     }
 
     /**
      * Creates a health professional who works the standard Monday to Friday
      * week. This is the second way of constructing an object: the caller does
-     * not have to supply a set of days when the common working week applies.
+     * not have to supply the days when the common working week applies.
      *
      * @param id   the identifier of the professional, numbers only
      * @param name the full name of the professional
-     * @throws IllegalArgumentException if the id or name is invalid
      */
     protected HealthProfessional(String id, String name) {
         this(id, name, Day.weekdays());
@@ -90,22 +92,22 @@ public abstract class HealthProfessional {
     }
 
     /**
-     * Returns the days this professional works. The returned set is a copy, so
-     * a caller may change it without changing the professional's roster.
+     * Returns the days this professional works. The returned list is a copy,
+     * so a caller may change it without changing the professional's roster.
      *
      * @return a copy of the working days
      */
-    public Set<Day> getAvailableDays() {
-        return EnumSet.copyOf(availableDays);
+    public List<String> getAvailableDays() {
+        return new ArrayList<>(availableDays);
     }
 
     /**
      * Returns true when this professional works on the given day.
      *
-     * @param day the day to check
+     * @param day the day to check, for example "Monday"
      * @return true if the professional is available on that day
      */
-    public boolean worksOn(Day day) {
+    public boolean worksOn(String day) {
         return day != null && availableDays.contains(day);
     }
 
@@ -133,7 +135,7 @@ public abstract class HealthProfessional {
      * @return a summary such as "Dr Alice Nguyen (General Practitioner, ID 1001)"
      */
     public String getSummary() {
-        return String.format("%s (%s, ID %s)", name, getProfessionalType(), id);
+        return name + " (" + getProfessionalType() + ", ID " + id + ")";
     }
 
     /**
@@ -144,8 +146,8 @@ public abstract class HealthProfessional {
      */
     @Override
     public String toString() {
-        return String.format("[%s] ID %s, %s%n    Available: %s",
-                getProfessionalType(), id, name, Day.format(availableDays));
+        return "[" + getProfessionalType() + "] ID " + id + ", " + name
+                + "\n    Available: " + Day.format(availableDays);
     }
 
     /**
@@ -182,6 +184,55 @@ public abstract class HealthProfessional {
     }
 
     /**
+     * Checks a professional ID. The ID must contain at least one digit and no
+     * other character, so that it can be used in a search.
+     *
+     * @param id the ID to check, which may be null or empty
+     * @return an empty text when the ID is valid, or a warning explaining why it is not
+     */
+    public static String validateId(String id) {
+        if (isBlank(id)) {
+            return WARNING_PREFIX + "a health professional must have an ID.";
+        }
+        if (!isDigitsOnly(id)) {
+            return WARNING_PREFIX + "a health professional ID must contain numbers only, but was \"" + id + "\".";
+        }
+        return "";
+    }
+
+    /**
+     * Checks a professional name.
+     *
+     * @param name the name to check, which may be null or empty
+     * @return an empty text when the name is valid, or a warning explaining why it is not
+     */
+    public static String validateName(String name) {
+        if (isBlank(name)) {
+            return WARNING_PREFIX + "a health professional must have a name.";
+        }
+        return "";
+    }
+
+    /**
+     * Checks a list of working days. At least one day is required and every
+     * entry must be a real day name.
+     *
+     * @param days the days to check, which may be null
+     * @return an empty text when the days are valid, or a warning explaining why they are not
+     */
+    public static String validateDays(List<String> days) {
+        if (days == null || days.isEmpty()) {
+            return WARNING_PREFIX + "a health professional must work on at least one day of the week.";
+        }
+        for (String day : days) {
+            if (!Day.isValid(day)) {
+                return WARNING_PREFIX + "\"" + day + "\" is not a day of the week.";
+            }
+        }
+        return "";
+    }
+
+    /**
      * Formats a number of years so that a single year is not printed as
      * "1 years". Subclasses use this when they print their own details.
      *
@@ -190,6 +241,17 @@ public abstract class HealthProfessional {
      */
     protected static String formatYears(int years) {
         return years == 1 ? "1 year" : years + " years";
+    }
+
+    /**
+     * Returns true when the text is null, empty, or contains only spaces.
+     * Subclasses use this when they check their own fields.
+     *
+     * @param text the text to check
+     * @return true if there is no usable text
+     */
+    protected static boolean isBlank(String text) {
+        return text == null || text.trim().isEmpty();
     }
 
     /**
@@ -210,5 +272,32 @@ public abstract class HealthProfessional {
             }
         }
         return true;
+    }
+
+    /**
+     * Builds the list of working days that is stored in the object.
+     *
+     * <p>Invalid entries are dropped and the days are put into calendar order,
+     * so the object always holds a usable roster. When nothing usable was
+     * supplied the standard Monday to Friday week is used.</p>
+     *
+     * @param days the days supplied by the caller, which may be null
+     * @return a new list of valid working days in calendar order
+     */
+    private static List<String> normaliseDays(List<String> days) {
+        List<String> ordered = new ArrayList<>();
+        if (days == null || days.isEmpty()) {
+            return Day.weekdays();
+        }
+        String[] allDays = Day.allDays();
+        for (int index = 0; index < allDays.length; index++) {
+            if (days.contains(allDays[index])) {
+                ordered.add(allDays[index]);
+            }
+        }
+        if (ordered.isEmpty()) {
+            return Day.weekdays();
+        }
+        return ordered;
     }
 }

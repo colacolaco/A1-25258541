@@ -1,4 +1,4 @@
-import java.util.Set;
+import java.util.List;
 
 /**
  * A nurse: a health professional who provides day to day care and can take
@@ -13,6 +13,9 @@ import java.util.Set;
  */
 public class Nurse extends HealthProfessional {
 
+    /** The default qualification used when none is supplied. */
+    private static final String DEFAULT_QUALIFICATION = "Registered Nurse";
+
     /** The nursing qualification, for example "Registered Nurse". */
     private final String qualification;
 
@@ -22,23 +25,16 @@ public class Nurse extends HealthProfessional {
     /**
      * Creates a nurse with a full set of details.
      *
-     * @param id            the identifier of the nurse, numbers only
-     * @param name          the full name of the nurse
-     * @param availableDays the days of the week the nurse works
-     * @param qualification the nursing qualification
+     * @param id              the identifier of the nurse, numbers only
+     * @param name            the full name of the nurse
+     * @param availableDays   the days of the week the nurse works
+     * @param qualification   the nursing qualification
      * @param yearsExperience the years registered, zero or more
-     * @throws IllegalArgumentException if any detail is missing or invalid
      */
-    public Nurse(String id, String name, Set<Day> availableDays, String qualification, int yearsExperience) {
+    public Nurse(String id, String name, List<String> availableDays, String qualification, int yearsExperience) {
         super(id, name, availableDays);
-        if (qualification == null || qualification.trim().isEmpty()) {
-            throw new IllegalArgumentException("A nurse must have a qualification.");
-        }
-        if (yearsExperience < 0) {
-            throw new IllegalArgumentException("Years of experience cannot be negative.");
-        }
-        this.qualification = qualification.trim();
-        this.yearsExperience = yearsExperience;
+        this.qualification = isBlank(qualification) ? DEFAULT_QUALIFICATION : qualification.trim();
+        this.yearsExperience = yearsExperience < 0 ? 0 : yearsExperience;
     }
 
     /**
@@ -47,10 +43,9 @@ public class Nurse extends HealthProfessional {
      *
      * @param id   the identifier of the nurse, numbers only
      * @param name the full name of the nurse
-     * @throws IllegalArgumentException if the id or name is invalid
      */
     public Nurse(String id, String name) {
-        this(id, name, Day.weekdays(), "Registered Nurse", 1);
+        this(id, name, Day.weekdays(), DEFAULT_QUALIFICATION, 1);
     }
 
     /**
@@ -95,14 +90,13 @@ public class Nurse extends HealthProfessional {
      * Takes a blood sample from a patient and returns a record of it.
      *
      * @param patientName the name of the patient
-     * @return a one line record of the sample
-     * @throws IllegalArgumentException if the patient name is missing
+     * @return a one line record of the sample, or a warning when the name is missing
      */
     public String takeBloodSample(String patientName) {
-        if (patientName == null || patientName.trim().isEmpty()) {
-            throw new IllegalArgumentException("A blood sample needs a patient name.");
+        if (isBlank(patientName)) {
+            return WARNING_PREFIX + "a blood sample needs a patient name.";
         }
-        return String.format("%s took a blood sample from %s.", getName(), patientName.trim());
+        return getName() + " took a blood sample from " + patientName.trim() + ".";
     }
 
     /**
@@ -113,6 +107,6 @@ public class Nurse extends HealthProfessional {
     @Override
     public String toString() {
         return super.toString()
-                + String.format("%n    Qualification: %s | Experience: %s", qualification, formatYears(yearsExperience));
+                + "\n    Qualification: " + qualification + " | Experience: " + formatYears(yearsExperience);
     }
 }

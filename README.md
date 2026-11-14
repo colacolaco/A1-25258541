@@ -29,7 +29,7 @@ demonstration.
 A1-25258541/
   src/                 all source files (default package, no package declaration)
     AssignmentOne.java the demonstration program (main)
-    Day.java           the seven days of the week
+    Day.java           the seven days of the week, as shared String constants
     TimeSlot.java      a time of day, ordered so appointments can be sorted
     ClinicSchedule.java the fixed 08:00-16:00, 30 minute daily schedule
     HealthProfessional.java abstract superclass for every health professional
@@ -57,11 +57,19 @@ them. An abstract class cannot be instantiated, which guarantees the clinic
 never holds a professional whose type is unknown.
 
 All state is `private final`, so an object can never reach an invalid state once
-it is built; validation happens in the constructor, which is the only place it
-needs to run. The identifier is checked with a character loop rather than a
-regular expression, and the working days are stored as an `EnumSet`, which
-keeps them unique and sorted and makes `worksOn(Day)` a single lookup. Getters
-return a fresh copy, so callers can read the days but cannot change them.
+it is built. The identifier is checked with a character loop rather than a
+regular expression, and the working days are stored as a list of the shared
+`Day` constants, kept unique and in calendar order, which makes
+`worksOn(String)` a single lookup. Getters return a fresh copy, so callers can
+read the days but cannot change them.
+
+Validation is done by `public static` methods - `HealthProfessional.validateId`,
+`validateName`, `validateDays`, `Patient.validateName`, `validateMobile` and
+`TimeSlot.validate` - which return either an empty string or a message starting
+with `WARNING:`. The constructors apply the same checks and fall back to safe
+defaults (`UNKNOWN_ID`, `UNKNOWN_NAME`, the Monday to Friday week, a room such
+as `G-01`), so an object is never half built, nothing has to be caught, and the
+demonstration can print a validation message and carry on.
 Two constructors are supplied: one taking every detail and a shorter one that
 uses the Monday to Friday week, so the common case stays short.
 
@@ -84,8 +92,8 @@ means adding one class and one `staff.add(...)` line; no existing loop changes.
 **`Appointment` (Part 4).** The patient is its own small class holding just the
 name and the mobile number, validated to ten digits starting with `04`, which
 keeps the validation in one place and lets one patient book several
-appointments. The three parts of an appointment are `final` and null-checked
-in the constructor, so an incomplete appointment cannot exist. `TimeSlot`
+appointments. The three parts of an appointment are `final`, so an incomplete
+appointment cannot exist. `TimeSlot`
 implements `Comparable` and is what makes appointment ordering work: comparing
 two `Appointment` objects compares their time slots first, and only when the
 times are equal compares the professional identifiers, which gives a stable
@@ -108,6 +116,28 @@ sorts the whole book or a filtered subset.
 holds an explicit `operatingDay` instead of reading the system clock, so the
 demonstration produces the same output every time it is run and the marking does
 not depend on which day it is opened.
+
+## Staying inside the material taught in Modules 1-3
+
+The brief allows only concepts, techniques and libraries taught so far. The
+code was written with that list in front of it, and three things that the unit
+has not demonstrated were deliberately not used:
+
+* **No `enum` and no `EnumSet`.** The seven days are `public static final
+  String` constants in `Day`, and a professional's working days are held in a
+  `List<String>`.
+* **No exceptions.** Nothing is thrown and nothing is caught, because exception
+  handling is Module 5. Every operation reports failure by returning a message
+  that starts with `WARNING:`, and the validators return an empty string or a
+  message.
+* **No `String.format` or `printf`.** All text is built with `+`, with small
+  helpers (`TimeSlot.twoDigits`, `Appointment.padRight`,
+  `AssignmentOne.padRight`) doing the padding the printed tables need.
+
+What is used is the material that is taught: classes, constructors, `private
+final` fields, encapsulation with getters, inheritance, abstract classes,
+polymorphism, `equals`/`hashCode`, `Comparable` and `Collections.sort`
+(Module 2), `ArrayList` and `List` (Module 2), and `System.out.println`.
 
 ## Mapping to the six parts
 

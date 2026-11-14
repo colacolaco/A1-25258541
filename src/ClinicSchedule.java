@@ -24,6 +24,9 @@ public class ClinicSchedule {
     /** The default length of one appointment, in minutes. */
     public static final int DEFAULT_SLOT_MINUTES = 30;
 
+    /** The number of minutes in one day. */
+    private static final int MINUTES_PER_DAY = 24 * 60;
+
     /** Every slot of the day, held in time order. */
     private final List<TimeSlot> slots;
 
@@ -56,36 +59,56 @@ public class ClinicSchedule {
      * at 16:00 would be seen after the clinic has closed, so the last slot of
      * the standard schedule is 15:30.</p>
      *
+     * <p>Values that cannot produce a workable day are replaced by the
+     * standard schedule instead of causing an error, because exceptions are
+     * not part of Modules 1 to 3.</p>
+     *
      * @param startHour           the hour the clinic opens
      * @param startMinute         the minute the clinic opens
      * @param endHour             the hour the clinic closes
      * @param endMinute           the minute the clinic closes
      * @param slotLengthInMinutes the length of one appointment in minutes
-     * @throws IllegalArgumentException if the values cannot make a schedule
      */
     public ClinicSchedule(int startHour, int startMinute, int endHour, int endMinute, int slotLengthInMinutes) {
-        if (slotLengthInMinutes <= 0) {
-            throw new IllegalArgumentException("An appointment must last at least one minute.");
-        }
+        int length = slotLengthInMinutes > 0 ? slotLengthInMinutes : DEFAULT_SLOT_MINUTES;
         int openingMinute = startHour * 60 + startMinute;
         int closingMinute = endHour * 60 + endMinute;
-        if (openingMinute < 0 || openingMinute >= 24 * 60) {
-            throw new IllegalArgumentException("The opening time is outside one day.");
+        if (openingMinute < 0 || openingMinute >= MINUTES_PER_DAY) {
+            openingMinute = DEFAULT_START_HOUR * 60;
         }
-        if (closingMinute <= openingMinute || closingMinute > 24 * 60) {
-            throw new IllegalArgumentException("The closing time must be after the opening time, within one day.");
+        if (closingMinute <= openingMinute || closingMinute > MINUTES_PER_DAY) {
+            closingMinute = DEFAULT_END_HOUR * 60;
         }
 
-        List<TimeSlot> createdSlots = new ArrayList<>();
-        // A slot is only bookable when the whole appointment fits before closing time.
-        for (int minute = openingMinute; minute + slotLengthInMinutes <= closingMinute; minute += slotLengthInMinutes) {
-            createdSlots.add(new TimeSlot(minute / 60, minute % 60));
-        }
+        List<TimeSlot> createdSlots = buildSlots(openingMinute, closingMinute, length);
         if (createdSlots.isEmpty()) {
-            throw new IllegalArgumentException("The opening hours are too short for a single appointment.");
+            // The opening hours were too short for one appointment, so the
+            // standard schedule is used rather than leaving the clinic with
+            // no bookable slot at all.
+            openingMinute = DEFAULT_START_HOUR * 60;
+            closingMinute = DEFAULT_END_HOUR * 60;
+            length = DEFAULT_SLOT_MINUTES;
+            createdSlots = buildSlots(openingMinute, closingMinute, length);
         }
         this.slots = createdSlots;
-        this.slotLengthInMinutes = slotLengthInMinutes;
+        this.slotLengthInMinutes = length;
+    }
+
+    /**
+     * Builds every bookable slot between two times of the day.
+     *
+     * @param openingMinute the opening time as minutes since midnight
+     * @param closingMinute the closing time as minutes since midnight
+     * @param length        the length of one appointment in minutes
+     * @return the list of slots, in time order
+     */
+    private static List<TimeSlot> buildSlots(int openingMinute, int closingMinute, int length) {
+        List<TimeSlot> createdSlots = new ArrayList<>();
+        // A slot is only bookable when the whole appointment fits before closing time.
+        for (int minute = openingMinute; minute + length <= closingMinute; minute += length) {
+            createdSlots.add(new TimeSlot(minute / 60, minute % 60));
+        }
+        return createdSlots;
     }
 
     /**
@@ -149,11 +172,8 @@ public class ClinicSchedule {
     @Override
     public String toString() {
         int closingMinute = getLastSlot().toMinutesSinceMidnight() + slotLengthInMinutes;
-        return String.format("%s-%02d:%02d, %d minute appointments, %d slots per day",
-                getFirstSlot(),
-                closingMinute / 60,
-                closingMinute % 60,
-                slotLengthInMinutes,
-                slots.size());
+        TimeSlot closingTime = new TimeSlot(closingMinute / 60, closingMinute % 60);
+        return getFirstSlot() + "-" + closingTime + ", " + slotLengthInMinutes
+                + " minute appointments, " + slots.size() + " slots per day";
     }
 }

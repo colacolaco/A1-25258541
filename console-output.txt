@@ -162,11 +162,14 @@ A different schedule object can be passed to the Clinic constructor;
 addAppointment then validates times against it with no other change.
 
 ==========================================================================================
-INVALID OBJECTS ARE REJECTED
+INVALID DATA IS REJECTED BEFORE AN OBJECT IS BUILT
 ==========================================================================================
-  Rejected nurse:   A health professional ID must contain numbers only, but was "12A".
-  Rejected patient: A mobile number must be 10 digits starting with 04, but was "12345".
-  Rejected time:    The minute must be between 0 and 59, but was 75.
+  WARNING: a health professional ID must contain numbers only, but was "12A".
+  WARNING: a mobile number must be 10 digits starting with 04, but was "12345".
+  WARNING: the minute must be between 0 and 59, but was 75.
+
+Each check returns a message instead of causing an error, so the program
+can show the message to the user and carry on with the valid data.
 
 ==========================================================================================
 END OF DEMONSTRATION
