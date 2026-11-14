@@ -1,0 +1,173 @@
+==========================================================================================
+PROG2004 Object Oriented Programming - Assessment 1
+Health Service Appointment System
+Student: 25258541
+==========================================================================================
+
+==========================================================================================
+PARTS 1-3: Health professionals
+==========================================================================================
+The clinic employs 9 health professionals:
+[General Practitioner] ID 1001, Dr Alice Nguyen
+    Available: Mon, Wed, Fri
+    Room: G-01 | Experience: 12 years
+
+[General Practitioner] ID 1002, Dr Ben Carter
+    Available: Mon, Tue, Wed, Thu, Fri
+    Room: G-02 | Experience: 5 years
+
+[General Practitioner] ID 1003, Dr Sofia Rossi
+    Available: Tue, Thu
+    Room: G-03 | Experience: 20 years
+
+[Specialist - Cardiology] ID 2001, Dr Wei Zhang
+    Available: Mon, Tue, Wed
+    Ward: Ward 3B
+
+[Specialist - Paediatrics] ID 2002, Dr Amara Okafor
+    Available: Mon, Tue, Wed, Thu, Fri
+    Ward: Ward 1
+
+[Nurse] ID 3001, Grace Miller
+    Available: Mon, Tue, Wed, Thu, Fri
+    Qualification: Registered Nurse | Experience: 8 years
+
+[Nurse] ID 3002, Tom Patel
+    Available: Mon, Tue, Wed, Thu, Fri
+    Qualification: Registered Nurse | Experience: 1 year
+
+[Surgeon - Orthopaedics] ID 5001, Dr Marcus King
+    Available: Mon, Thu
+    Theatre: Theatre 2 | Operations per week: 6
+
+[Dietitian - Sports nutrition] ID 4001, Hannah Lee
+    Available: Mon, Wed
+    Room: D-02
+
+
+Type specific behaviour (only available on the concrete type)
+------------------------------------------------------------------------------------------
+  Dr Alice Nguyen prescribed Amoxicillin 500 mg to Priya Sharma.
+  Dr Wei Zhang ordered a diagnostic test (Echocardiogram) for Chen Wei.
+  Grace Miller took a blood sample from Emily Brown.
+  Dr Marcus King performed the Knee arthroscopy procedure on Liam O'Brien in Theatre 2.
+  Hannah Lee created a meal plan for Noah Wilson with the goal: Lower cholesterol.
+
+The same call, answered differently by each type (polymorphism)
+------------------------------------------------------------------------------------------
+  Dr Alice Nguyen:   diagnoses common illnesses, treats ongoing conditions, refers patients to specialists and prescribes medication
+  Dr Ben Carter:     diagnoses common illnesses, treats ongoing conditions, refers patients to specialists and prescribes medication
+  Dr Sofia Rossi:    diagnoses common illnesses, treats ongoing conditions, refers patients to specialists and prescribes medication
+  Dr Wei Zhang:      provides expert assessment in Cardiology, diagnoses complex conditions and orders diagnostic tests
+  Dr Amara Okafor:   provides expert assessment in Paediatrics, diagnoses complex conditions and orders diagnostic tests
+  Grace Miller:      monitors patients, changes dressings, takes blood samples and gives immunisations
+  Tom Patel:         monitors patients, changes dressings, takes blood samples and gives immunisations
+  Dr Marcus King:    performs Orthopaedics operations and provides post operative care
+  Hannah Lee:        assesses nutritional needs and designs meal plans for sports nutrition
+
+==========================================================================================
+PARTS 4-6: Appointments
+==========================================================================================
+Clinic:          SCU Health Service Clinic
+Operating day:   Monday
+Daily schedule:  08:00-16:00, 30 minute appointments, 16 slots per day
+
+Booking appointments
+------------------------------------------------------------------------------------------
+  BOOKED      09:00  Dr Alice Nguyen (General Practitioner, ID 1001) for Priya Sharma
+  BOOKED      10:30  Dr Alice Nguyen (General Practitioner, ID 1001) for Liam O'Brien
+  BOOKED      08:30  Dr Wei Zhang (Specialist - Cardiology, ID 2001) for Chen Wei
+  BOOKED      09:30  Grace Miller (Nurse, ID 3001) for Emily Brown
+  BOOKED      11:00  Hannah Lee (Dietitian - Sports nutrition, ID 4001) for Noah Wilson
+  BOOKED      12:00  Dr Marcus King (Surgeon - Orthopaedics, ID 5001) for Olivia Martin
+  BOOKED      10:30  Dr Amara Okafor (Specialist - Paediatrics, ID 2002) for Maya Singh
+  BOOKED      08:00  Dr Ben Carter (General Practitioner, ID 1002) for Jack Taylor
+
+Bookings that must be rejected (error cases)
+------------------------------------------------------------------------------------------
+  WARNING: Dr Alice Nguyen (General Practitioner, ID 1001) already has an appointment at 09:00.
+  WARNING: Dr Sofia Rossi (General Practitioner, ID 1003) does not work on Mondays.
+  WARNING: 07:15 is not a bookable time slot. Bookable schedule: 08:00-16:00, 30 minute appointments, 16 slots per day.
+  WARNING: Priya Sharma already has an appointment at 09:00 with Dr Alice Nguyen (General Practitioner, ID 1001).
+
+All appointments (in the order they were booked)
+------------------------------------------------------------------------------------------
+  09:00  Dr Alice Nguyen (General Practitioner, ID 1001)       Priya Sharma (0412 345 678)
+  10:30  Dr Alice Nguyen (General Practitioner, ID 1001)       Liam O'Brien (0422 334 455)
+  08:30  Dr Wei Zhang (Specialist - Cardiology, ID 2001)       Chen Wei (0433 445 566)
+  09:30  Grace Miller (Nurse, ID 3001)                         Emily Brown (0444 556 677)
+  11:00  Hannah Lee (Dietitian - Sports nutrition, ID 4001)    Noah Wilson (0455 667 788)
+  12:00  Dr Marcus King (Surgeon - Orthopaedics, ID 5001)      Olivia Martin (0466 778 899)
+  10:30  Dr Amara Okafor (Specialist - Paediatrics, ID 2002)   Maya Singh (0477 889 900)
+  08:00  Dr Ben Carter (General Practitioner, ID 1002)         Jack Taylor (0470 112 233)
+
+All appointments sorted from earliest to latest
+------------------------------------------------------------------------------------------
+  08:00  Dr Ben Carter (General Practitioner, ID 1002)         Jack Taylor (0470 112 233)
+  08:30  Dr Wei Zhang (Specialist - Cardiology, ID 2001)       Chen Wei (0433 445 566)
+  09:00  Dr Alice Nguyen (General Practitioner, ID 1001)       Priya Sharma (0412 345 678)
+  09:30  Grace Miller (Nurse, ID 3001)                         Emily Brown (0444 556 677)
+  10:30  Dr Alice Nguyen (General Practitioner, ID 1001)       Liam O'Brien (0422 334 455)
+  10:30  Dr Amara Okafor (Specialist - Paediatrics, ID 2002)   Maya Singh (0477 889 900)
+  11:00  Hannah Lee (Dietitian - Sports nutrition, ID 4001)    Noah Wilson (0455 667 788)
+  12:00  Dr Marcus King (Surgeon - Orthopaedics, ID 5001)      Olivia Martin (0466 778 899)
+
+Filtered by health professional ID 1001 (Dr Alice Nguyen)
+------------------------------------------------------------------------------------------
+  09:00  Dr Alice Nguyen (General Practitioner, ID 1001)       Priya Sharma (0412 345 678)
+  10:30  Dr Alice Nguyen (General Practitioner, ID 1001)       Liam O'Brien (0422 334 455)
+
+Filtered by patient mobile number 0422334455 (Liam O'Brien)
+------------------------------------------------------------------------------------------
+  10:30  Dr Alice Nguyen (General Practitioner, ID 1001)       Liam O'Brien (0422 334 455)
+
+Filtered subset of ID 1001, sorted by time
+------------------------------------------------------------------------------------------
+  09:00  Dr Alice Nguyen (General Practitioner, ID 1001)       Priya Sharma (0412 345 678)
+  10:30  Dr Alice Nguyen (General Practitioner, ID 1001)       Liam O'Brien (0422 334 455)
+
+Cancelling an appointment by health professional ID and time
+------------------------------------------------------------------------------------------
+  CANCELLED   09:30  Grace Miller (Nurse, ID 3001) for Emily Brown
+
+Cancelling an appointment by patient mobile number
+------------------------------------------------------------------------------------------
+  CANCELLED   12:00  Dr Marcus King (Surgeon - Orthopaedics, ID 5001) for Olivia Martin
+
+Cancellations that must be rejected (error cases)
+------------------------------------------------------------------------------------------
+  WARNING: No appointment was found for health professional 9999 at 08:00.
+  WARNING: No appointment was found for mobile number 0499999999.
+  WARNING: No appointment was found for health professional 3001 at 09:30.
+
+The updated appointment book, sorted by time
+------------------------------------------------------------------------------------------
+  08:00  Dr Ben Carter (General Practitioner, ID 1002)         Jack Taylor (0470 112 233)
+  08:30  Dr Wei Zhang (Specialist - Cardiology, ID 2001)       Chen Wei (0433 445 566)
+  09:00  Dr Alice Nguyen (General Practitioner, ID 1001)       Priya Sharma (0412 345 678)
+  10:30  Dr Alice Nguyen (General Practitioner, ID 1001)       Liam O'Brien (0422 334 455)
+  10:30  Dr Amara Okafor (Specialist - Paediatrics, ID 2002)   Maya Singh (0477 889 900)
+  11:00  Hannah Lee (Dietitian - Sports nutrition, ID 4001)    Noah Wilson (0455 667 788)
+
+Total appointments now held by the clinic: 6
+
+==========================================================================================
+THE FIXED DAILY SCHEDULE IS FLEXIBLE
+==========================================================================================
+Standard schedule: 08:00-16:00, 30 minute appointments, 16 slots per day
+Longer day:        07:00-19:00, 30 minute appointments, 24 slots per day
+20 minute slots:   09:00-17:00, 20 minute appointments, 24 slots per day
+
+A different schedule object can be passed to the Clinic constructor;
+addAppointment then validates times against it with no other change.
+
+==========================================================================================
+INVALID OBJECTS ARE REJECTED
+==========================================================================================
+  Rejected nurse:   A health professional ID must contain numbers only, but was "12A".
+  Rejected patient: A mobile number must be 10 digits starting with 04, but was "12345".
+  Rejected time:    The minute must be between 0 and 59, but was 75.
+
+==========================================================================================
+END OF DEMONSTRATION
+==========================================================================================
