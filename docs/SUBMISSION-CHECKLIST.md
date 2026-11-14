@@ -2,18 +2,23 @@
 
 ## 1. The zip
 
-`A1-25258541.zip` in this folder, containing the whole `A1-25258541` project
-folder. Built from the source folder excluding `bin/` and `.git/`.
+`A1-25258541.zip` sits next to the project folder (`Desktop\OOP`) and contains
+the whole `A1-25258541` folder: `src/`, `docs/`, `README.md`, `.gitignore` and
+`console-output.txt`. `bin/` and `.git/` are deliberately left out. It compiles
+from a clean extract and reproduces `console-output.txt` exactly.
 
 ## 2. GitHub repository link
 
-- Create the repository (private is recommended by the brief) and push this
-  project.
+- Repository: https://github.com/colacolaco/A1-25258541 (private).
+- It already holds the project in seven commits, one per design step.
 - Commit as you continue to work on it - the brief wants progress over the
   assessment period, not one commit at the end.
-- If the repository is private, invite your tutor and the unit assessor as
-  collaborators, otherwise they cannot see it.
+- Because the repository is private, invite your tutor and the unit assessor as
+  collaborators (Settings > Collaborators), otherwise they cannot see it.
 - Paste the repository URL into the Blackboard submission comments.
+- To push further commits from this machine, git has to go through the local
+  proxy on port 7892 (`git config http.proxy` in the project already does this);
+  remove that setting with `git config --unset http.proxy` if the proxy is off.
 
 ## 3. WakaTime evidence
 
