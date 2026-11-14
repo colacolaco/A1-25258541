@@ -27,8 +27,14 @@ public class Appointment implements Comparable<Appointment> {
     private final TimeSlot timeSlot;
 
     /**
-     * Creates an appointment. All details are required, so an appointment can
-     * never be created while it is missing a patient, a professional or a time.
+     * Creates an appointment. All three details are needed for the object to
+     * describe a real booking; {@link #isComplete()} reports whether they were
+     * actually supplied.
+     *
+     * <p>The constructor itself never fails, because exceptions belong to a
+     * later module. A caller that may pass a missing detail checks
+     * {@link #isComplete()} first, and {@link Clinic#addAppointment(Appointment)}
+     * does exactly that before an appointment is allowed into the book.</p>
      *
      * @param patient      the patient who booked the appointment, must not be null
      * @param professional the health professional the patient will see, must not be null
@@ -38,6 +44,20 @@ public class Appointment implements Comparable<Appointment> {
         this.patient = patient;
         this.professional = professional;
         this.timeSlot = timeSlot;
+    }
+
+    /**
+     * Returns true when this appointment holds a patient, a health
+     * professional and a time.
+     *
+     * <p>Java allows null to be passed to a constructor, so an object can
+     * exist while it is still missing a detail. An incomplete object is never
+     * added to the clinic's book: the clinic reports a warning instead.</p>
+     *
+     * @return true if all three details are present
+     */
+    public boolean isComplete() {
+        return patient != null && professional != null && timeSlot != null;
     }
 
     /**

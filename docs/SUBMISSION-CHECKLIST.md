@@ -3,18 +3,20 @@
 ## 1. The zip
 
 `A1-25258541.zip` sits next to the project folder (`Desktop\OOP`) and contains
-the whole `A1-25258541` folder: `src/`, `docs/`, `README.md`, `.gitignore` and
-`console-output.txt`. `bin/` and `.git/` are deliberately left out. It compiles
-from a clean extract and reproduces `console-output.txt` exactly.
+one top-level folder, `A1-25258541/`, holding `src/`, `docs/`, `README.md`,
+`.gitignore` and `console-output.txt`. `bin/` and `.git/` are deliberately left
+out. Entry names use `/` separators, as the zip format requires, so the folder
+structure survives on macOS and Linux. It compiles from a clean extract and
+reproduces `console-output.txt` exactly.
 
 ## 2. GitHub repository link
 
-- Repository: https://github.com/colacolaco/A1-25258541 (private).
-- It already holds the project in seven commits, one per design step.
+- Repository: https://github.com/colacolaco/A1-25258541 (public, so the marker
+  can open it without being invited).
+- It holds the project in one commit per design step, all authored by
+  `colacolaco`.
 - Commit as you continue to work on it - the brief wants progress over the
   assessment period, not one commit at the end.
-- Because the repository is private, invite your tutor and the unit assessor as
-  collaborators (Settings > Collaborators), otherwise they cannot see it.
 - Paste the repository URL into the Blackboard submission comments.
 - To push further commits from this machine, git has to go through the local
   proxy on port 7892 (`git config http.proxy` in the project already does this);

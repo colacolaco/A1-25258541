@@ -29,6 +29,9 @@ public class Patient {
     /** The mobile phone number, stored as ten digits with no spaces. */
     private final String mobileNumber;
 
+    /** True when both the name and the mobile number were valid. */
+    private final boolean validDetails;
+
     /**
      * Creates a patient with a name and an Australian mobile phone number.
      *
@@ -41,6 +44,7 @@ public class Patient {
      * @param mobileNumber the mobile number as ten digits, for example "0412345678"
      */
     public Patient(String name, String mobileNumber) {
+        this.validDetails = !isBlank(name) && isValidMobile(mobileNumber);
         this.name = isBlank(name) ? UNKNOWN_NAME : name.trim();
         this.mobileNumber = isValidMobile(mobileNumber) ? mobileNumber : UNKNOWN_MOBILE;
     }
@@ -62,6 +66,20 @@ public class Patient {
      */
     public String getMobileNumber() {
         return mobileNumber;
+    }
+
+    /**
+     * Returns true when both details supplied to the constructor were valid.
+     *
+     * <p>An object built from invalid data still holds safe values (the
+     * constructor never fails), but it remembers that the data was not valid,
+     * so the clinic can refuse to book it instead of quietly using the
+     * default mobile number.</p>
+     *
+     * @return true if the name and the mobile number were both valid
+     */
+    public boolean hasValidDetails() {
+        return validDetails;
     }
 
     /**

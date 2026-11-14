@@ -25,6 +25,9 @@ public class TimeSlot implements Comparable<TimeSlot> {
     /** The minute of the hour, from 0 to 59. */
     private final int minute;
 
+    /** True when the hour and minute supplied to the constructor were valid. */
+    private final boolean valid;
+
     /**
      * Creates a time slot at the given hour and minute.
      *
@@ -37,6 +40,7 @@ public class TimeSlot implements Comparable<TimeSlot> {
      * @param minute the minute of the hour; values outside 0 to 59 are corrected
      */
     public TimeSlot(int hour, int minute) {
+        this.valid = validate(hour, minute).isEmpty();
         this.hour = normalise(hour, HOURS_PER_DAY - 1);
         this.minute = normalise(minute, MINUTES_PER_HOUR - 1);
     }
@@ -68,6 +72,21 @@ public class TimeSlot implements Comparable<TimeSlot> {
             return "WARNING: the minute must be between 0 and " + (MINUTES_PER_HOUR - 1) + ", but was " + minute + ".";
         }
         return "";
+    }
+
+    /**
+     * Returns true when the hour and minute given to the constructor were
+     * inside the range of a clock.
+     *
+     * <p>A slot built from, for example, hour 9 and minute 75 is corrected to
+     * 10:15 so that the object is still usable, but the correction is
+     * remembered here. The clinic checks this flag, so a time that had to be
+     * corrected is reported to the user instead of being booked silently.</p>
+     *
+     * @return true if no correction was needed
+     */
+    public boolean isValid() {
+        return valid;
     }
 
     /**

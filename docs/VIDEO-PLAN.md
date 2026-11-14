@@ -42,6 +42,10 @@ Still in `HealthProfessional.java`.
   gets their own copy, so they can read the days but cannot edit the
   professional's week. The same "return a copy" idea is used by
   `ClinicSchedule.getSlots()`.
+- No silent repair: `hasValidDetails()` on a professional or a patient, and
+  `isValid()` on a `TimeSlot`, remember whether a default had to be used, and
+  `Clinic.addAppointment` refuses anything that was corrected. Show the four
+  warnings printed by the "protects the appointment book" block.
 - `Patient.java`: the mobile number is validated to ten digits starting with
   `04`, and `toString()` formats it for display while the field keeps the plain
   digits.

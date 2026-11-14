@@ -187,6 +187,21 @@ public class AssignmentOne {
         System.out.println();
         System.out.println("Each check returns a message instead of causing an error, so the program");
         System.out.println("can show the message to the user and carry on with the valid data.");
+        System.out.println();
+
+        // Even if an incomplete or invalid object is built, the clinic refuses
+        // it, so nothing invalid can ever reach the appointment book.
+        printSubSection("The same rule protects the appointment book");
+        Clinic validationDemo = new Clinic("Validation demo clinic", Day.MONDAY);
+        System.out.println("  " + validationDemo.addAppointment(
+                new Appointment(null, drCarter, TimeSlot.of(9, 0))));
+        System.out.println("  " + validationDemo.addAppointment(
+                new Appointment(priya, new Nurse("12A", "Nurse X"), TimeSlot.of(9, 0))));
+        System.out.println("  " + validationDemo.addAppointment(
+                new Appointment(new Patient("Sam Lee", "12345"), drCarter, TimeSlot.of(10, 0))));
+        System.out.println("  " + validationDemo.addAppointment(
+                new Appointment(jack, drCarter, new TimeSlot(9, 75))));
+        System.out.println("  Appointments in this clinic: " + validationDemo.getNumberOfAppointments());
 
         printSection("END OF DEMONSTRATION");
     }

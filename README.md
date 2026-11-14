@@ -68,8 +68,12 @@ Validation is done by `public static` methods - `HealthProfessional.validateId`,
 `TimeSlot.validate` - which return either an empty string or a message starting
 with `WARNING:`. The constructors apply the same checks and fall back to safe
 defaults (`UNKNOWN_ID`, `UNKNOWN_NAME`, the Monday to Friday week, a room such
-as `G-01`), so an object is never half built, nothing has to be caught, and the
-demonstration can print a validation message and carry on.
+as `G-01`), so an object is never half built and nothing has to be caught. A
+fallback is never silent: every object records whether its own details were
+valid (`HealthProfessional.hasValidDetails()`, `Patient.hasValidDetails()`,
+`TimeSlot.isValid()`), and `Clinic.addAppointment` refuses an object that had
+to be corrected, so a default ID or a default mobile number can never reach the
+appointment book.
 Two constructors are supplied: one taking every detail and a shorter one that
 uses the Monday to Friday week, so the common case stays short.
 
@@ -92,8 +96,12 @@ means adding one class and one `staff.add(...)` line; no existing loop changes.
 **`Appointment` (Part 4).** The patient is its own small class holding just the
 name and the mobile number, validated to ten digits starting with `04`, which
 keeps the validation in one place and lets one patient book several
-appointments. The three parts of an appointment are `final`, so an incomplete
-appointment cannot exist. `TimeSlot`
+appointments. The three parts of an appointment are `final`, and `isComplete()`
+reports whether all three were actually supplied. Java allows `null` to be
+passed to a constructor, so `Clinic.addAppointment` checks `isComplete()` and
+returns a warning instead of letting a missing detail reach the book (and a
+`NullPointerException` is impossible for an appointment that was accepted).
+`TimeSlot`
 implements `Comparable` and is what makes appointment ordering work: comparing
 two `Appointment` objects compares their time slots first, and only when the
 times are equal compares the professional identifiers, which gives a stable
@@ -103,9 +111,9 @@ be in any order.
 **`Clinic` (Part 5).** The appointment book is an `ArrayList<Appointment>`. The
 schedule is the separate `ClinicSchedule` class so the clinic's opening hours are
 configured in one place, and `addAppointment` validates in a deliberate order:
-the appointment exists, the time is a bookable slot, the professional works that
-day, the professional is free at that time, and the patient is free at that
-time. Every check returns a message starting with `WARNING:` instead of throwing,
+the appointment exists and is complete, none of its details had to be
+corrected, the time is a bookable slot, the professional works that day, the
+professional is free at that time, and the patient is free at that time. Every check returns a message starting with `WARNING:` instead of throwing,
 so the demonstration can show a rejected booking and carry on. Professional
 equality is by identifier (`equals`/`hashCode`), which is how a double booking is
 detected even if a different object for the same professional is passed in.

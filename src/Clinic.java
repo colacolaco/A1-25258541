@@ -94,10 +94,12 @@ public class Clinic {
     /**
      * Adds an appointment to the clinic, if every rule allows it.
      *
-     * <p>The booking is rejected when the appointment is missing, when the
-     * time is not one of the clinic's slots, when the professional does not
-     * work on the day, when the professional is already booked at that time,
-     * or when the patient is already booked at that time.</p>
+     * <p>The booking is rejected when the appointment is missing, when one of
+     * its details was never supplied, when a detail had to be corrected
+     * because it was invalid, when the time is not one of the clinic's slots,
+     * when the professional does not work on the day, when the professional is
+     * already booked at that time, or when the patient is already booked at
+     * that time.</p>
      *
      * @param appointment the appointment to add
      * @return a message describing the booking, or a warning explaining why
@@ -107,8 +109,25 @@ public class Clinic {
         if (appointment == null) {
             return warning("No appointment was supplied.");
         }
+        // 0. Every detail must be present, and none may have been corrected.
+        if (!appointment.isComplete()) {
+            return warning("An appointment is only complete with a patient, a health professional "
+                    + "and a time, so it was not booked.");
+        }
         TimeSlot time = appointment.getTimeSlot();
         HealthProfessional professional = appointment.getProfessional();
+        Patient patient = appointment.getPatient();
+        if (!professional.hasValidDetails()) {
+            return warning("The health professional has invalid details (ID " + professional.getId()
+                    + ", name " + professional.getName() + "), so the appointment was not booked.");
+        }
+        if (!patient.hasValidDetails()) {
+            return warning("The patient has invalid details (name " + patient.getName() + ", mobile "
+                    + patient.getMobileNumber() + "), so the appointment was not booked.");
+        }
+        if (!time.isValid()) {
+            return warning("The requested time was not a valid time of day, so the appointment was not booked.");
+        }
 
         // 1. The time must be one of the clinic's fixed slots.
         if (!schedule.isBookable(time)) {
@@ -124,15 +143,15 @@ public class Clinic {
             return warning(professional.getSummary() + " already has an appointment at " + time + ".");
         }
         // 4. A patient cannot be in two places at the same time either.
-        Appointment patientClash = findAppointmentFor(appointment.getPatient(), time);
+        Appointment patientClash = findAppointmentFor(patient, time);
         if (patientClash != null) {
-            return warning(appointment.getPatient().getName() + " already has an appointment at " + time
+            return warning(patient.getName() + " already has an appointment at " + time
                     + " with " + patientClash.getProfessional().getSummary() + ".");
         }
 
         appointments.add(appointment);
         return "BOOKED      " + time + "  " + professional.getSummary()
-                + " for " + appointment.getPatient().getName();
+                + " for " + patient.getName();
     }
 
     /**

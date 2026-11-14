@@ -45,6 +45,9 @@ public abstract class HealthProfessional {
     /** The days of the week on which this professional works, in calendar order. */
     private final List<String> availableDays;
 
+    /** True when every detail passed to the constructor was valid. */
+    private final boolean validDetails;
+
     /**
      * Creates a health professional who works on the given days.
      *
@@ -56,6 +59,9 @@ public abstract class HealthProfessional {
      * @param availableDays the days of the week the professional works
      */
     protected HealthProfessional(String id, String name, List<String> availableDays) {
+        this.validDetails = validateId(id).isEmpty()
+                && validateName(name).isEmpty()
+                && validateDays(availableDays).isEmpty();
         this.id = isDigitsOnly(id) ? id : UNKNOWN_ID;
         this.name = isBlank(name) ? UNKNOWN_NAME : name.trim();
         this.availableDays = normaliseDays(availableDays);
@@ -99,6 +105,20 @@ public abstract class HealthProfessional {
      */
     public List<String> getAvailableDays() {
         return new ArrayList<>(availableDays);
+    }
+
+    /**
+     * Returns true when the professional was created from valid details.
+     *
+     * <p>An object built from invalid data still holds safe, usable values
+     * (the constructor never fails), but it remembers that the data was not
+     * valid. The clinic uses this flag to refuse such a professional instead
+     * of quietly booking an appointment against a default ID.</p>
+     *
+     * @return true if the ID, the name and the working days were all valid
+     */
+    public boolean hasValidDetails() {
+        return validDetails;
     }
 
     /**

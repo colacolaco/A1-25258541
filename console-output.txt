@@ -171,6 +171,15 @@ INVALID DATA IS REJECTED BEFORE AN OBJECT IS BUILT
 Each check returns a message instead of causing an error, so the program
 can show the message to the user and carry on with the valid data.
 
+
+The same rule protects the appointment book
+------------------------------------------------------------------------------------------
+  WARNING: An appointment is only complete with a patient, a health professional and a time, so it was not booked.
+  WARNING: The health professional has invalid details (ID 0000, name Nurse X), so the appointment was not booked.
+  WARNING: The patient has invalid details (name Sam Lee, mobile 0400000000), so the appointment was not booked.
+  WARNING: The requested time was not a valid time of day, so the appointment was not booked.
+  Appointments in this clinic: 0
+
 ==========================================================================================
 END OF DEMONSTRATION
 ==========================================================================================
