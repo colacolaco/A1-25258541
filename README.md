@@ -61,7 +61,7 @@ it is built; validation happens in the constructor, which is the only place it
 needs to run. The identifier is checked with a character loop rather than a
 regular expression, and the working days are stored as an `EnumSet`, which
 keeps them unique and sorted and makes `worksOn(Day)` a single lookup. Getters
-return unmodifiable views, so callers can read the days but cannot change them.
+return a fresh copy, so callers can read the days but cannot change them.
 Two constructors are supplied: one taking every detail and a shorter one that
 uses the Monday to Friday week, so the common case stays short.
 

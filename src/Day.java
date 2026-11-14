@@ -88,17 +88,17 @@ public enum Day {
         if (days == null || days.isEmpty()) {
             return "not available";
         }
-        StringBuilder text = new StringBuilder();
+        String text = "";
         for (Day day : values()) {
             if (!days.contains(day)) {
                 continue;
             }
             if (text.length() > 0) {
-                text.append(", ");
+                text = text + ", ";
             }
-            text.append(day.shortName);
+            text = text + day.shortName;
         }
-        return text.toString();
+        return text;
     }
 
     /**

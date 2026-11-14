@@ -104,7 +104,9 @@ public class Patient {
      */
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(name, mobileNumber);
+        int result = name.hashCode();
+        result = 31 * result + mobileNumber.hashCode();
+        return result;
     }
 
     /**
@@ -119,7 +121,8 @@ public class Patient {
             return false;
         }
         for (int index = 0; index < number.length(); index++) {
-            if (!Character.isDigit(number.charAt(index))) {
+            char digit = number.charAt(index);
+            if (digit < '0' || digit > '9') {
                 return false;
             }
         }

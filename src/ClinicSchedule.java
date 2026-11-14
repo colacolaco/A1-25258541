@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -91,12 +90,12 @@ public class ClinicSchedule {
 
     /**
      * Returns every bookable slot of the day, in time order. The returned list
-     * is read-only, so callers cannot damage the clinic's schedule.
+     * is a copy, so a caller may change it without damaging the schedule.
      *
-     * @return an unmodifiable list of the day's slots
+     * @return a copy of the day's slots
      */
     public List<TimeSlot> getSlots() {
-        return Collections.unmodifiableList(slots);
+        return new ArrayList<>(slots);
     }
 
     /**

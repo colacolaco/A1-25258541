@@ -93,7 +93,15 @@ public class TimeSlot implements Comparable<TimeSlot> {
         if (other == null) {
             throw new NullPointerException("A time slot cannot be compared with null.");
         }
-        return Integer.compare(toMinutesSinceMidnight(), other.toMinutesSinceMidnight());
+        int thisMinutes = toMinutesSinceMidnight();
+        int otherMinutes = other.toMinutesSinceMidnight();
+        if (thisMinutes < otherMinutes) {
+            return -1;
+        }
+        if (thisMinutes > otherMinutes) {
+            return 1;
+        }
+        return 0;
     }
 
     /**
@@ -121,7 +129,7 @@ public class TimeSlot implements Comparable<TimeSlot> {
      */
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(hour, minute);
+        return 31 * hour + minute;
     }
 
     /**

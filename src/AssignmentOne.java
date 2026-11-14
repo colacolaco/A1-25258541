@@ -88,7 +88,7 @@ public class AssignmentOne {
 
         printSubSection("The same call, answered differently by each type (polymorphism)");
         for (HealthProfessional professional : staff) {
-            System.out.printf("  %-18s %s%n", professional.getName() + ":", professional.describeServices());
+            System.out.println("  " + padRight(professional.getName() + ":", 19) + professional.describeServices());
         }
 
         // ===================================================================
@@ -235,6 +235,22 @@ public class AssignmentOne {
         System.out.println();
         System.out.println(title);
         System.out.println(THIN_LINE);
+    }
+
+    /**
+     * Pads text with spaces on the right until it reaches the given width, so
+     * the columns of the demonstration output stay aligned.
+     *
+     * @param text  the text to pad
+     * @param width the minimum width of the result
+     * @return the text followed by enough spaces to reach the width
+     */
+    private static String padRight(String text, int width) {
+        String padded = text;
+        while (padded.length() < width) {
+            padded = padded + " ";
+        }
+        return padded;
     }
 
     /**

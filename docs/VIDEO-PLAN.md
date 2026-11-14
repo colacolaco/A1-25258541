@@ -36,9 +36,9 @@ Still in `HealthProfessional.java`.
 - All fields `private final`; `id`, `name`, `availableDays` cannot be reassigned.
 - Validation in the constructor: an ID with a letter, a blank name or an empty
   day set cannot produce an object. The manual digit loop in `isDigitsOnly`.
-- `getAvailableDays()` returns
-  `Collections.unmodifiableSet(EnumSet.copyOf(availableDays))` - the caller can
-  read the days, but cannot edit the professional's week.
+- `getAvailableDays()` returns `EnumSet.copyOf(availableDays)` - the caller gets
+  their own copy, so they can read the days but cannot edit the professional's
+  week. The same "return a copy" idea is used by `ClinicSchedule.getSlots()`.
 - `Patient.java`: the mobile number is validated to ten digits starting with
   `04`, and `toString()` formats it for display while the field keeps the plain
   digits.

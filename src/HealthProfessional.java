@@ -1,4 +1,3 @@
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -91,13 +90,13 @@ public abstract class HealthProfessional {
     }
 
     /**
-     * Returns the days this professional works. The returned set is a
-     * read-only copy, so callers cannot change the professional's roster.
+     * Returns the days this professional works. The returned set is a copy, so
+     * a caller may change it without changing the professional's roster.
      *
-     * @return an unmodifiable set of working days
+     * @return a copy of the working days
      */
     public Set<Day> getAvailableDays() {
-        return Collections.unmodifiableSet(EnumSet.copyOf(availableDays));
+        return EnumSet.copyOf(availableDays);
     }
 
     /**
@@ -205,7 +204,8 @@ public abstract class HealthProfessional {
             return false;
         }
         for (int index = 0; index < text.length(); index++) {
-            if (!Character.isDigit(text.charAt(index))) {
+            char character = text.charAt(index);
+            if (character < '0' || character > '9') {
                 return false;
             }
         }
