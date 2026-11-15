@@ -9,3 +9,6 @@ out/
 *.iml
 .DS_Store
 Thumbs.db
+
+# Personal recording notes, not part of the submission
+docs/VIDEO-SCRIPT.md
