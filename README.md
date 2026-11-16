@@ -20,8 +20,10 @@ javac -d bin src/*.java
 java -cp bin AssignmentOne
 ```
 
-`console-output.txt` is the complete output of one run, kept as evidence of the
-demonstration.
+`console-output.txt` is the complete output of one run, kept in the repository
+as evidence of the demonstration. The submitted zip contains only `src/` and
+this README, so the markers see the source and the design notes and nothing
+else.
 
 ### Running it in Visual Studio Code
 
@@ -54,11 +56,15 @@ A1-25258541/
     Patient.java       patient name and validated mobile number
     Appointment.java   patient + health professional + time, ordered by time
     Clinic.java        manages the appointment book
-  docs/                video plan and submission checklist
-  README.md
-  .gitignore
-  console-output.txt
+  docs/                video plan and submission checklist (repository only)
+  README.md            this file
+  .gitignore           repository only
+  console-output.txt   repository only
 ```
+
+The zip is `A1-25258541.zip`: one top-level folder holding `src/` (all thirteen
+`.java` files) and `README.md`. The working notes in `docs/`, the run log, the
+editor settings and the git files are not part of it.
 
 ## Design and the reasoning behind it
 

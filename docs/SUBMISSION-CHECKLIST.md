@@ -3,9 +3,10 @@
 ## 1. The zip
 
 `A1-25258541.zip` sits next to the project folder (`Desktop\OOP`) and contains
-one top-level folder, `A1-25258541/`, holding `src/`, `docs/`, `README.md`,
-`.gitignore` and `console-output.txt`. `bin/` and `.git/` are deliberately left
-out. Entry names use `/` separators, as the zip format requires, so the folder
+one top-level folder, `A1-25258541/`, holding exactly `src/` (all thirteen
+`.java` files) and `README.md`. Nothing else is included: `docs/`, `.gitignore`,
+`console-output.txt`, `bin/`, `.vscode/` and `.git/` stay out of the submission.
+Entry names use `/` separators, as the zip format requires, so the folder
 structure survives on macOS and Linux. It compiles from a clean extract and
 reproduces `console-output.txt` exactly.
 
